@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { NativeBaseProvider, Box, Divider } from 'native-base';
 import { Pressable, Text, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,12 +9,32 @@ import IconFeather from 'react-native-vector-icons/Feather';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome'
 import IconOcticons from 'react-native-vector-icons/Octicons'
 import IconIonicons from 'react-native-vector-icons/Ionicons'
+import db from '../../database/SQLiteDatabase';
+import LembreteDB from '../../database/Lembrete';
 
 
 export default function Menu({navigation: {navigate}}){
+    const [lembretes, setLembretes] = useState([])
+
+    useEffect(() => {
+        db.transaction(tx => {
+            tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS lembrete(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo VARCHAR(50), inicio DATETIME, final DATETIME, descricao TEXT)"
+            )
+        })
+           listar()
+    },[])
+
+    const listar = () => {
+        LembreteDB.all().then(data => {
+            setLembretes(data)
+        })
+
+        console.log(lembretes)
+    }
     return(
         <NativeBaseProvider config={config}>
-            <Box style={[style.background]} bg={gradient1}>
+            <Box style={[style.background]} bg={gradient1} >
                 <ScrollView>
 
                 
@@ -24,12 +44,9 @@ export default function Menu({navigation: {navigate}}){
                        
                             <ScrollView horizontal={true}>
                             
-
-                            
-                                <Lembrete titulo={'Ler a Bíblia'} horario={'Dia todo'}/>
-
-                                <Lembrete titulo={'Ir no RH'} horario={'15:00'}/>
-                                <Lembrete titulo={'Programar'} horario={'15:30-16:00'}/>
+                            {lembretes.map(lembrete => (
+                                <Lembrete key={lembrete.id} titulo={lembrete.titulo} />
+                            ))}
                        
                             </ScrollView>
                             
