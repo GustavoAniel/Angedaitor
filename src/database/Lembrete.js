@@ -1,16 +1,19 @@
 import db from './SQLiteDatabase'
 
 db.transaction(tx => {
-    tx.executeSql(
-        "DROP TABLE cars;"
-    )
+    // tx.executeSql(
+    //     "DROP TABLE lembrete;"
+    // )
 
     tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS lembrete(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo VARCHAR(50), inicio DATETIME, fim DATETIME, descricao TEXT)"
+        "CREATE TABLE IF NOT EXISTS lembrete(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo VARCHAR(50), inicio DATETIME, final DATETIME, descricao TEXT)"
     )
+
+    console.log('teste')
 })
 
 const create = (obj) => {
+    console.log(obj)
     return new Promise( (resolve, reject) => {
         db.transaction(
             tx => {
@@ -21,7 +24,7 @@ const create = (obj) => {
                         else
                             reject('Erro inserindo o obj: ' +JSON.stringify(obj))
                     },
-                    error => reject(error)
+                    (_, error) => reject(error)
                 )
             }
         )
@@ -34,11 +37,28 @@ const all = () => {
             tx => {
                 tx.executeSql('SELECT * FROM lembrete', [],
                 (_, { rows }) => resolve(rows._array),
-                error => reject(error)
+                (_, error) => reject(error)
                 )
             }
         )
     })
 }
 
-export default { create, all }
+const remove = (id) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        //comando SQL modificável
+        tx.executeSql(
+          "DELETE FROM lembrete WHERE id=?;",
+          [id],
+          //-----------------------
+          (_, { rowsAffected }) => {
+            resolve(rowsAffected);
+          },
+          (_, error) => reject(error) // erro interno em tx.executeSql
+        );
+      });
+    });
+};
+
+export default { create, all, remove }
