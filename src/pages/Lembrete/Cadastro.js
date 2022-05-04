@@ -5,17 +5,29 @@ import { LinearGradient } from 'expo-linear-gradient';
 import style from '../../styles/Geral';
 import { styleCadastro } from '../../styles/Planos';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
+import Lembrete from '../../database/Lembrete'
+import LembreteModel from '../../model/Lembrete'
 
 export default function Cadastro({navigation: {goBack}}){
+    const [titulo, setTitulo] = useState('');           
     const [horario, setHorario] = useState('00:00');
     const [data, setData] = useState('');
+    const [descricao, setDescricao] = useState()
+    const [inicio , setInicio] = useState()
+    const [final, setFinal] = useState()
 
-    //States só do TimerPicker 
+    //States só do DateTimePicker 
     const [show, setShow] = useState(false);
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState('time');
 
     const [desahabi, setDesahabi] = useState(true) //Habilitar ou não os campos de horário e do dia
+
+    const cadastrar = (titulo, inicio, final, descricao) => {
+ 
+        const novoLembrete = new LembreteModel(titulo, inicio, final, descricao)
+        Lembrete.create(novoLembrete).then(() => {console.log('Executando...')})
+    }
 
     useEffect(()=>{
         let dataAgora = new Date();
@@ -42,9 +54,10 @@ export default function Cadastro({navigation: {goBack}}){
             minutos = '0'+minutos
         }
 
-        setHorario(horas+':'+minutos);
-        setData(dia+'/'+mes+'/'+dataAgora.getFullYear());
-
+        setHorario(horas+':'+minutos); //Colocando o horário atual na visão do usuario
+        setData(dia+'/'+mes+'/'+dataAgora.getFullYear()); //Colocando a data atual na visão do usuario
+        setInicio(dataAgora.getFullYear()+'-'+mes+'-'+dia+' '+horas+':'+minutos) //Colocando data e hora atual na visão do sistema
+        setFinal(dataAgora.getFullYear()+'-'+mes+'-'+dia+' '+horas+':'+minutos)
     },[])
 
 
@@ -81,7 +94,9 @@ export default function Cadastro({navigation: {goBack}}){
         }else{
             setData(dia+'/'+mes+'/'+tempoPicker.getFullYear());
         }
-        
+
+        setInicio(tempoPicker.getFullYear()+'-'+mes+'-'+dia+' '+horas+':'+minutos)
+        setFinal(tempoPicker.getFullYear()+'-'+mes+'-'+dia+' '+horas+':'+minutos)
     }
 
     const showMode = (modoAtual) => {
@@ -94,6 +109,7 @@ export default function Cadastro({navigation: {goBack}}){
             <Box bg={gradient1} style={[style.background]}>
                 <Text style={[styleCadastro.titulo]}>Cadastrar Plano</Text>
 
+                <Text style={[styleCadastro.titulo]}>{inicio}</Text>
                 <ScrollView>
 
                         <FormControl >
@@ -101,7 +117,7 @@ export default function Cadastro({navigation: {goBack}}){
 
                                 <Box>
                                     <FormControl.Label _android={{_text:{color: 'white', fontSize: 20}}}>Título</FormControl.Label>
-                                    <Input color='white' />
+                                    <Input color='white' onChangeText={(titulo) => setTitulo(titulo)} />
                                     <FormControl.HelperText _android={{_text:{color: '#DCDCDC'}}}>
                                         Insira o nome desse plano.
                                     </FormControl.HelperText>
@@ -148,7 +164,7 @@ export default function Cadastro({navigation: {goBack}}){
 
                                 <Box>
                                     <FormControl.Label _android={{_text:{color: 'white', fontSize: 20}}}>Descrição</FormControl.Label>
-                                    <TextArea color='white' />
+                                    <TextArea onChangeText={(descricao) => setDescricao(descricao)} color='white' />
                                     <FormControl.HelperText _android={{_text:{color: '#DCDCDC'}}}>
                                         Descreva mais sobre o lembrete.
                                     </FormControl.HelperText>
@@ -158,7 +174,7 @@ export default function Cadastro({navigation: {goBack}}){
                                 </Box>
                                 
                                 <Box flexDirection={'row'} justifyContent={'space-between'}>
-                                    <Button borderColor={'white'} borderWidth={1} backgroundColor={'#4500D8'} size={'lg'} >Salvar</Button>
+                                    <Button borderColor={'white'} borderWidth={1} backgroundColor={'#4500D8'} size={'lg'} onPress={() => {cadastrar(titulo, inicio, final, descricao)}}>Salvar</Button>
 
 
                                     <Button borderColor={'white'} borderWidth={1} backgroundColor={'transparent'} size={'lg'} onPress={()=> goBack()}>Cancelar</Button>
