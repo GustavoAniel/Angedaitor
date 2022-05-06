@@ -6,7 +6,7 @@ db.transaction(tx => {
     // )
 
     tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS lembrete(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo VARCHAR(50), inicio DATETIME, final DATETIME, descricao TEXT)"
+        "CREATE TABLE IF NOT EXISTS lembrete(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo VARCHAR(50), horario VARCHAR(45), finalizado INT, inicio DATETIME, final DATETIME, descricao TEXT, data_criacao DATETIME)"
     )
 
     console.log('teste')
@@ -17,7 +17,7 @@ const create = (obj) => {
     return new Promise( (resolve, reject) => {
         db.transaction(
             tx => {
-                tx.executeSql("INSERT INTO lembrete (titulo, inicio, final, descricao) VALUES (?, ?, ?, ?);" , [obj.titulo, obj.inicio, obj.final, obj.descricao],
+                tx.executeSql("INSERT INTO lembrete (titulo, horario, finalizado, inicio, final, descricao, data_criacao) VALUES (?, ?, ?, ?, ?, ?, ?);" , [obj.titulo, obj.horario, obj.finalizado, obj.inicio, obj.final, obj.descricao, obj.data_criacao],
                     (_, {rowsAffected, insertId}) => {
                         if(rowsAffected > 0)
                             resolve(insertId)
