@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { NativeBaseProvider, Box, FormControl, Stack, Input, Select, TextArea, Radio, Button, ScrollView } from 'native-base';
+import { NativeBaseProvider, Box, FormControl, Stack, Input, Select, TextArea, Radio, Button, ScrollView, Modal } from 'native-base';
 import { Text, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import style from '../../styles/Geral';
@@ -8,13 +8,16 @@ import RNDateTimePicker from '@react-native-community/datetimepicker';
 import Lembrete from '../../database/Lembrete'
 import LembreteModel from '../../model/Lembrete'
 
-export default function Cadastro({navigation: {goBack}}){
+export default function Cadastro({navigation: { navigate, reset }}){
     const [titulo, setTitulo] = useState('');           
     const [horario, setHorario] = useState('00:00');
+    const [finalizado, setFinalizado] = useState(0)
     const [data, setData] = useState('');
-    const [descricao, setDescricao] = useState()
-    const [inicio , setInicio] = useState()
-    const [final, setFinal] = useState()
+    const [descricao, setDescricao] = useState();
+    const [inicio , setInicio] = useState();
+    const [final, setFinal] = useState();
+    const [agora, setAgora] = useState();
+    const [horarioAtual, setHorarioAtual] = useState('');
 
     //States só do DateTimePicker 
     const [show, setShow] = useState(false);
@@ -23,10 +26,11 @@ export default function Cadastro({navigation: {goBack}}){
 
     const [desahabi, setDesahabi] = useState(true) //Habilitar ou não os campos de horário e do dia
 
-    const cadastrar = (titulo, inicio, final, descricao) => {
+    const cadastrar = (titulo, horario, finalizado, inicio, final, descricao, data_criacao) => {
  
-        const novoLembrete = new LembreteModel(titulo, inicio, final, descricao)
+        const novoLembrete = new LembreteModel(titulo, horario, finalizado, inicio, final, descricao, data_criacao)
         Lembrete.create(novoLembrete).then(() => {console.log('Executando...')})
+        reset({index: 0, routes: [{name: 'Inicio'}]})
     }
 
     useEffect(()=>{
@@ -58,7 +62,18 @@ export default function Cadastro({navigation: {goBack}}){
         setData(dia+'/'+mes+'/'+dataAgora.getFullYear()); //Colocando a data atual na visão do usuario
         setInicio(dataAgora.getFullYear()+'-'+mes+'-'+dia+' '+horas+':'+minutos) //Colocando data e hora atual na visão do sistema
         setFinal(dataAgora.getFullYear()+'-'+mes+'-'+dia+' '+horas+':'+minutos)
+        setAgora(dataAgora.getFullYear()+'-'+mes+'-'+dia+' '+horas+':'+minutos)
     },[])
+
+    const campoHorario = (item) => {
+        if(item == 'Agora mesmo'){
+            setDesahabi(true)
+        }else{
+            setDesahabi(false)
+        }
+        setHorarioAtual(item)
+        console.log(horarioAtual)
+    }
 
 
     const onChange = (evento, dataSelecionada) => {
@@ -129,7 +144,7 @@ export default function Cadastro({navigation: {goBack}}){
                                 <Box>
                                     <FormControl.Label _android={{_text:{color: 'white', fontSize: 20}}}>Horário</FormControl.Label>
 
-                                    <Select placeholder='Selecione aqui' onValueChange={item => item == 'Agora mesmo' ? setDesahabi(true): setDesahabi(false)} color={'white'} _light>
+                                    <Select placeholder='Selecione aqui' onValueChange={item => {campoHorario(item)}} color={'white'} _light>
                                         <Select.Item label='Agora mesmo' value='Agora mesmo' />
                                         <Select.Item label='Início e Fim' value='Início e Fim'/>
                                         <Select.Item label='Só Início' value='Só Início'/>
@@ -174,10 +189,10 @@ export default function Cadastro({navigation: {goBack}}){
                                 </Box>
                                 
                                 <Box flexDirection={'row'} justifyContent={'space-between'}>
-                                    <Button borderColor={'white'} borderWidth={1} backgroundColor={'#4500D8'} size={'lg'} onPress={() => {cadastrar(titulo, inicio, final, descricao)}}>Salvar</Button>
+                                    <Button borderColor={'white'} borderWidth={1} backgroundColor={'#4500D8'} size={'lg'} onPress={() => {cadastrar(titulo, horarioAtual, finalizado, inicio, final, descricao, agora)}}>Salvar</Button>
 
 
-                                    <Button borderColor={'white'} borderWidth={1} backgroundColor={'transparent'} size={'lg'} onPress={()=> goBack()}>Cancelar</Button>
+                                    <Button borderColor={'white'} borderWidth={1} backgroundColor={'transparent'} size={'lg'} onPress={()=> navigate('Inicio')}>Cancelar</Button>
                                 </Box>
                             </Stack>
                         </FormControl>
@@ -185,6 +200,7 @@ export default function Cadastro({navigation: {goBack}}){
                 {show && (
                    <RNDateTimePicker testID='dateTimePicker' mode={mode} value={date} is24Hour={true} display='default' onChange={onChange}/>
                 )}
+                
             </Box>
         </NativeBaseProvider>
     )
