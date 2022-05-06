@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { NativeBaseProvider, Box, Divider } from 'native-base';
+import { NativeBaseProvider, Box, Divider, Modal, Center } from 'native-base';
 import { Pressable, Text, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import style from '../../styles/Geral';
@@ -14,39 +14,62 @@ import LembreteDB from '../../database/Lembrete';
 
 
 export default function Menu({navigation: {navigate}}){
-    const [lembretes, setLembretes] = useState([])
+    const [titulo, setTitulo] = useState('');
+    const [inicio, setInicio] = useState('');
+    const [final, setFinal] = useState('');
+    const [descricao, setDescricao] = useState('');
+
+
+    const [lembretes, setLembretes] = useState([]) //Array
+
+    const [visivel, setVisivel] = useState(false);
 
     useEffect(() => {
         db.transaction(tx => {
+
             tx.executeSql(
-                "CREATE TABLE IF NOT EXISTS lembrete(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo VARCHAR(50), inicio DATETIME, final DATETIME, descricao TEXT)"
+                "CREATE TABLE IF NOT EXISTS lembrete(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo VARCHAR(50), horario VARCHAR(45), finalizado INT, inicio DATETIME, final DATETIME, descricao TEXT, data_criacao DATETIME)"
             )
+            console.log('UseEffect executado')
         })
-           listar()
+
+        listar()
+
     },[])
 
     const listar = () => {
+        setLembretes([])
         LembreteDB.all().then(data => {
             setLembretes(data)
+            console.log(data)
         })
-
-        console.log(lembretes)
     }
+
+    const modal = (titulo, inicio, final, descricao) => {
+        setTitulo(titulo);
+        setInicio(inicio);
+        setFinal(final);
+        setDescricao(descricao);
+
+        setVisivel(true)
+    }
+
     return(
-        <NativeBaseProvider config={config}>
+        <NativeBaseProvider config={config} >
             <Box style={[style.background]} bg={gradient1} >
                 <ScrollView>
 
-                
-                
                     <Box style={[styleMenu.card]} bg={gradient}>
                         <Text style={[styleMenu.tituloCard]}>O que tem pra hoje</Text>
                        
                             <ScrollView horizontal={true}>
-                            
-                            {lembretes.map(lembrete => (
-                                <Lembrete key={lembrete.id} titulo={lembrete.titulo} />
-                            ))}
+                
+                                {lembretes.map(lembrete => (
+                                    <Pressable onPress={() => modal(lembrete.titulo, lembrete.inicio, lembrete.final, lembrete.descricao)}>
+                                        <Lembrete key={lembrete.id} titulo={lembrete.titulo} />
+                                    </Pressable>
+
+                                ))}
                        
                             </ScrollView>
                             
@@ -94,6 +117,21 @@ export default function Menu({navigation: {navigate}}){
                     </Box>
                 </ScrollView>
                 
+                <Modal isOpen={visivel} onClose={() => setVisivel(false)}>
+                    <Modal.Content>
+                        <Modal.Header>
+                            <Text>{titulo}</Text>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Box flex={1} bg={'white'}>
+                                <Text>{inicio}</Text>
+                                <Text>{final}</Text>
+                                <Text>{descricao}</Text>
+                            </Box>
+                        
+                        </Modal.Body>
+                    </Modal.Content>
+                </Modal>
             </Box>
         </NativeBaseProvider>
     )
