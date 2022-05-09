@@ -50,10 +50,11 @@ const remove = (id) => {
         //comando SQL modificável
         tx.executeSql(
           "DELETE FROM lembrete WHERE id=?;",
-          [id],
+          [id.id],
           //-----------------------
           (_, { rowsAffected }) => {
             resolve(rowsAffected);
+            console.log('Tudo certo')
           },
           (_, error) => reject(error) // erro interno em tx.executeSql
         );
