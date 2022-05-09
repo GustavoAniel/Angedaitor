@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { NativeBaseProvider, Box, Divider, Modal, Center } from 'native-base';
+import { NativeBaseProvider, Box, Divider, Modal, Center, Button } from 'native-base';
 import { Pressable, Text, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import style from '../../styles/Geral';
@@ -11,9 +11,11 @@ import IconOcticons from 'react-native-vector-icons/Octicons'
 import IconIonicons from 'react-native-vector-icons/Ionicons'
 import db from '../../database/SQLiteDatabase';
 import LembreteDB from '../../database/Lembrete';
+import styleModal from '../../styles/Modal';
 
 
-export default function Menu({navigation: {navigate}}){
+export default function Menu({navigation: {navigate, reset}}){
+    const [id, setId] = useState(0);
     const [titulo, setTitulo] = useState('');
     const [inicio, setInicio] = useState('');
     const [final, setFinal] = useState('');
@@ -45,13 +47,26 @@ export default function Menu({navigation: {navigate}}){
         })
     }
 
-    const modal = (titulo, inicio, final, descricao) => {
+    const deletar = (id) => {
+        console.log(id)
+        LembreteDB.remove(id).then(ox => {
+            console.log(ox)
+        }).catch(err => console.log(err))
+        
+        reset({index: 0, routes: [{name: 'Inicio'}]})
+    }
+
+    const modal = (id, titulo, inicio, final, descricao) => {
+        setId(id)
         setTitulo(titulo);
         setInicio(inicio);
         setFinal(final);
         setDescricao(descricao);
 
         setVisivel(true)
+
+        let testedata = new Date();
+        console.log(testedata); 
     }
 
     return(
@@ -64,13 +79,12 @@ export default function Menu({navigation: {navigate}}){
                        
                             <ScrollView horizontal={true}>
                 
-                                {lembretes.map(lembrete => (
-                                    <Pressable onPress={() => modal(lembrete.titulo, lembrete.inicio, lembrete.final, lembrete.descricao)}>
+                                {lembretes.length != 0 ? lembretes.map(lembrete => (
+                                    <Pressable onPress={() => modal(lembrete.id, lembrete.titulo, lembrete.inicio, lembrete.final, lembrete.descricao)}>
                                         <Lembrete key={lembrete.id} titulo={lembrete.titulo} />
                                     </Pressable>
 
-                                ))}
-                       
+                                )) : <Center><Text style={[styleMenu.textoNd]}>Você não cadastrou nada até agora...</Text></Center>}
                             </ScrollView>
                             
 
@@ -119,17 +133,21 @@ export default function Menu({navigation: {navigate}}){
                 
                 <Modal isOpen={visivel} onClose={() => setVisivel(false)}>
                     <Modal.Content>
-                        <Modal.Header>
-                            <Text>{titulo}</Text>
+                        <Modal.Header alignItems='center'>
+                            <Text style={[styleModal.titulo]}>{titulo}</Text>
                         </Modal.Header>
                         <Modal.Body>
+
                             <Box flex={1} bg={'white'}>
-                                <Text>{inicio}</Text>
-                                <Text>{final}</Text>
-                                <Text>{descricao}</Text>
+                                <Text style={[styleModal.texto]}>Inicio: {inicio}</Text>
+                                <Text style={[styleModal.texto]}>Final: {final}</Text>
+                                <Text style={[styleModal.texto]}>Descrição: {descricao}</Text>
                             </Box>
                         
                         </Modal.Body>
+                        <Modal.Footer>
+                            <Button onPress={() => deletar({id})} bg='danger.600'>Excluir</Button>
+                        </Modal.Footer>
                     </Modal.Content>
                 </Modal>
             </Box>
