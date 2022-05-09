@@ -37,6 +37,9 @@ const styleMenu = StyleSheet.create({
         justifyContent: 'space-between', 
         flexDirection: 'row',
         marginVertical: 20
+    },
+    textoNd: {
+        color: '#d4d4d4',
     }
 })
 
