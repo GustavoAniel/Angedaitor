@@ -9,11 +9,9 @@ db.transaction(tx => {
         "CREATE TABLE IF NOT EXISTS lembrete(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo VARCHAR(50), horario VARCHAR(45), finalizado INT, inicio DATETIME, final DATETIME, descricao TEXT, data_criacao DATETIME)"
     )
 
-    console.log('teste')
 })
 
 const create = (obj) => {
-    console.log(obj)
     return new Promise( (resolve, reject) => {
         db.transaction(
             tx => {
@@ -54,7 +52,6 @@ const remove = (id) => {
           //-----------------------
           (_, { rowsAffected }) => {
             resolve(rowsAffected);
-            console.log('Tudo certo')
           },
           (_, error) => reject(error) // erro interno em tx.executeSql
         );
