@@ -6,7 +6,7 @@ const styleLemb = StyleSheet.create({
         width: 160,
         height: 160,
         borderRadius: 5,
-        marginRight: 8
+        margin: 5
     },
     miniCard: {
         flex: 1,

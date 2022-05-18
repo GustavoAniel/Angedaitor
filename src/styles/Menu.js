@@ -8,14 +8,14 @@ const styleMenu = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowOffset: {width: 1, height: 4},
         elevation: 20,
-        marginBottom: 50
+        marginBottom: 50,
+        maxHeight: 450
     },
     tituloCard: {
         color: 'white',
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: 20,
-        marginBottom: 10
+        fontSize: 30,
     },
 
 
