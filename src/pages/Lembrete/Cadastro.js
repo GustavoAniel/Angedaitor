@@ -11,7 +11,7 @@ import LembreteModel from '../../model/Lembrete'
 export default function Cadastro({navigation: { navigate, reset }}){
     const [titulo, setTitulo] = useState('');           
     const [horario, setHorario] = useState('00:00');
-    const [finalizado, setFinalizado] = useState(0)
+    const [finalizado, setFinalizado] = useState(0);
     const [data, setData] = useState('');
     const [descricao, setDescricao] = useState();
     const [inicio , setInicio] = useState();
@@ -27,10 +27,14 @@ export default function Cadastro({navigation: { navigate, reset }}){
     const [desahabi, setDesahabi] = useState(true) //Habilitar ou não os campos de horário e do dia
 
     const cadastrar = (titulo, horario, finalizado, inicio, final, descricao, data_criacao) => {
- 
-        const novoLembrete = new LembreteModel(titulo, horario, finalizado, inicio, final, descricao, data_criacao)
-        Lembrete.create(novoLembrete).then(() => {console.log('Executando...')})
-        reset({index: 0, routes: [{name: 'Inicio'}]})
+
+        if(horario == ''){
+            console.log('Aqui não amigo!!')
+        }else{
+            const novoLembrete = new LembreteModel(titulo, horario, finalizado, inicio, final, descricao, data_criacao)
+            Lembrete.create(novoLembrete).then(() => {console.log('Executando...')})
+            reset({index: 0, routes: [{name: 'Inicio'}]})
+        }  
     }
 
     useEffect(()=>{
@@ -123,8 +127,6 @@ export default function Cadastro({navigation: { navigate, reset }}){
         <NativeBaseProvider config={config}>
             <Box bg={gradient1} style={[style.background]}>
                 <Text style={[styleCadastro.titulo]}>Cadastrar Plano</Text>
-
-                <Text style={[styleCadastro.titulo]}>{inicio}</Text>
                 <ScrollView>
 
                         <FormControl >
@@ -192,7 +194,7 @@ export default function Cadastro({navigation: { navigate, reset }}){
                                     <Button borderColor={'white'} borderWidth={1} backgroundColor={'#4500D8'} size={'lg'} onPress={() => {cadastrar(titulo, horarioAtual, finalizado, inicio, final, descricao, agora)}}>Salvar</Button>
 
 
-                                    <Button borderColor={'white'} borderWidth={1} backgroundColor={'transparent'} size={'lg'} onPress={()=> navigate('Inicio')}>Cancelar</Button>
+                                    <Button borderColor={'white'} borderWidth={1} backgroundColor={'transparent'} size={'lg'} onPress={()=> reset({index: 0, routes: [{name: 'Inicio'}]})}>Cancelar</Button>
                                 </Box>
                             </Stack>
                         </FormControl>
