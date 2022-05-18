@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import { NativeBaseProvider, Box, Divider, Modal, Center, Button } from 'native-base';
-import { Pressable, Text, ScrollView } from 'react-native';
+import React, {useEffect, useState, use} from 'react';
+import { NativeBaseProvider, Box, Divider, Modal, Button } from 'native-base';
+import { Pressable, Text, ScrollView, FlatList  } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import style from '../../styles/Geral';
 import styleMenu from '../../styles/Menu';
@@ -23,6 +23,7 @@ export default function Menu({navigation: {navigate, reset}}){
 
 
     const [lembretes, setLembretes] = useState([]) //Array
+    const [hoje, setHoje] = useState([])
 
     const [visivel, setVisivel] = useState(false);
 
@@ -39,18 +40,46 @@ export default function Menu({navigation: {navigate, reset}}){
 
     },[])
 
+   
+
+    const formatoData = (data) => { //DD-MM-AAAA
+        let dataN = data.split(" ")[0]
+        dataN = dataN.split('-')[2]+'/'+dataN.split('-')[1]+'/'+dataN.split('-')[0]
+        return dataN
+    }
+
+    const dataAgora = () => {
+        let date = new Date();
+
+        let dia = date.getDate();
+        let mes = date.getMonth()+1;
+
+        if(dia < 10){
+            dia = '0'+dia;
+        }
+
+        if(mes < 10){
+            mes = '0'+mes;
+        }
+
+        let result = dia+'/'+mes+'/'+date.getFullYear()
+
+        return result
+    }
+
     const listar = () => {
-        setLembretes([])
+
+        console.log('Função Listar')
+
         LembreteDB.all().then(data => {
             setLembretes(data)
-            console.log(data)
         })
     }
+
 
     const deletar = (id) => {
         console.log(id)
         LembreteDB.remove(id).then(ox => {
-            console.log(ox)
         }).catch(err => console.log(err))
         
         reset({index: 0, routes: [{name: 'Inicio'}]})
@@ -63,10 +92,7 @@ export default function Menu({navigation: {navigate, reset}}){
         setFinal(final);
         setDescricao(descricao);
 
-        setVisivel(true)
-
-        let testedata = new Date();
-        console.log(testedata); 
+        setVisivel(true);
     }
 
     return(
@@ -75,27 +101,22 @@ export default function Menu({navigation: {navigate, reset}}){
                 <ScrollView>
 
                     <Box style={[styleMenu.card]} bg={gradient}>
-                        <Text style={[styleMenu.tituloCard]}>O que tem pra hoje</Text>
-                       
-                            <ScrollView horizontal={true}>
-                
-                                {lembretes.length != 0 ? lembretes.map(lembrete => (
-                                    <Pressable onPress={() => modal(lembrete.id, lembrete.titulo, lembrete.inicio, lembrete.final, lembrete.descricao)}>
-                                        <Lembrete key={lembrete.id} titulo={lembrete.titulo} />
-                                    </Pressable>
-
-                                )) : <Center><Text style={[styleMenu.textoNd]}>Você não cadastrou nada até agora...</Text></Center>}
-                            </ScrollView>
-                            
+                        <Text style={[styleMenu.tituloCard]}>Planos</Text>
 
                         <Divider marginY={4} />
-                        <Text style={[styleMenu.tituloCard]}>Outros planos</Text>
-
-                        <ScrollView>
-
-                            <Lembrete titulo={'Trocar o SSD do Cássio'} horario={'15:00'} data={'10/05/22'}/>
-
-                        </ScrollView>    
+                        
+                        <FlatList nestedScrollEnabled={true} data={lembretes} numColumns={2} keyExtractor={(item) => item.id} renderItem={({item}) => {
+                            return <Pressable onPress={() => modal(item.id, item.titulo, item.inicio, item.final, item.descricao)}>
+                                    <Lembrete key={item.id} titulo={item.titulo} horario={item.inicio}/>
+                                </Pressable>
+                        }} />
+            
+                        {/* {lembretes.map(lembrete => (
+                            <Pressable onPress={() => modal(lembrete.id, lembrete.titulo, lembrete.inicio, lembrete.final, lembrete.descricao)}>
+                                <Lembrete key={lembrete.id} titulo={lembrete.titulo} horario={lembrete.inicio}/>
+                            </Pressable>))
+                        }     */}
+  
                     </Box>
 
                     <Box style={{marginBottom: 20}}>
