@@ -33,7 +33,7 @@ const all = () => {
     return new Promise( (resolve, reject) => {
         db.transaction(
             tx => {
-                tx.executeSql('SELECT * FROM lembrete', [],
+                tx.executeSql('SELECT * FROM lembrete ORDER BY inicio', [],
                 (_, { rows }) => resolve(rows._array),
                 (_, error) => reject(error)
                 )
@@ -59,4 +59,19 @@ const remove = (id) => {
     });
 };
 
-export default { create, all, remove }
+const finalizar = (id) => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                "UPDATE lembrete SET finalizado = 1 WHERE id=?;",
+                [id.id],
+                (_, {rowsAffected}) => {
+                    resolve(rowsAffected);
+                },
+                (_, error) => reject(error)
+            );
+        });
+    });
+}
+
+export default { create, all, finalizar, remove }
