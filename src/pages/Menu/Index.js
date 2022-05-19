@@ -70,8 +70,6 @@ export default function Menu({navigation: {navigate, reset}}){
 
     const listar = () => {
 
-        console.log('Função Listar')
-
         LembreteDB.all().then(data => {
             setLembretes(data)
         })
@@ -79,7 +77,6 @@ export default function Menu({navigation: {navigate, reset}}){
 
 
     const deletar = (id) => {
-        console.log(id)
         LembreteDB.remove(id).then(ox => {
         }).catch(err => console.log(err))
         

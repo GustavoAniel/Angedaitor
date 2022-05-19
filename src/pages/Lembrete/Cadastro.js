@@ -29,7 +29,7 @@ export default function Cadastro({navigation: { navigate, reset }}){
     const cadastrar = (titulo, horario, finalizado, inicio, final, descricao, data_criacao) => {
 
         if(horario == ''){
-            console.log('Aqui não amigo!!')
+            console.log('Preencha o campo!!')
         }else{
             const novoLembrete = new LembreteModel(titulo, horario, finalizado, inicio, final, descricao, data_criacao)
             Lembrete.create(novoLembrete).then(() => {console.log('Executando...')})
@@ -76,7 +76,6 @@ export default function Cadastro({navigation: { navigate, reset }}){
             setDesahabi(false)
         }
         setHorarioAtual(item)
-        console.log(horarioAtual)
     }
 
 
