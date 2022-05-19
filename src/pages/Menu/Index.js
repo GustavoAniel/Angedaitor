@@ -20,6 +20,7 @@ export default function Menu({navigation: {navigate, reset}}){
     const [inicio, setInicio] = useState('');
     const [final, setFinal] = useState('');
     const [descricao, setDescricao] = useState('');
+    const [finalizado, setFinalizado] = useState(0);
 
 
     const [lembretes, setLembretes] = useState([]) //Array
@@ -85,12 +86,20 @@ export default function Menu({navigation: {navigate, reset}}){
         reset({index: 0, routes: [{name: 'Inicio'}]})
     }
 
-    const modal = (id, titulo, inicio, final, descricao) => {
+    const finalizar = (id) => {
+        LembreteDB.finalizar(id).then(ox => {
+
+        }).catch(err => console.log(err))
+        reset({index: 0, routes: [{name: 'Inicio'}]})
+    }
+
+    const modal = (id, titulo, inicio, final, descricao, finalizado) => {
         setId(id)
         setTitulo(titulo);
         setInicio(inicio);
         setFinal(final);
         setDescricao(descricao);
+        setFinalizado(finalizado)
 
         setVisivel(true);
     }
@@ -98,7 +107,7 @@ export default function Menu({navigation: {navigate, reset}}){
     return(
         <NativeBaseProvider config={config} >
             <Box style={[style.background]} bg={gradient1} >
-                <ScrollView>
+                
 
                     <Box style={[styleMenu.card]} bg={gradient}>
                         <Text style={[styleMenu.tituloCard]}>Planos</Text>
@@ -106,8 +115,8 @@ export default function Menu({navigation: {navigate, reset}}){
                         <Divider marginY={4} />
                         
                         <FlatList nestedScrollEnabled={true} data={lembretes} numColumns={2} keyExtractor={(item) => item.id} renderItem={({item}) => {
-                            return <Pressable onPress={() => modal(item.id, item.titulo, item.inicio, item.final, item.descricao)}>
-                                    <Lembrete key={item.id} titulo={item.titulo} horario={item.inicio}/>
+                            return <Pressable onPress={() => modal(item.id, item.titulo, item.inicio, item.final, item.descricao, item.finalizado)}>
+                                    <Lembrete key={item.id} titulo={item.titulo} horario={item.inicio} data={item.inicio} finalizado={item.finalizado}/>
                                 </Pressable>
                         }} />
             
@@ -118,6 +127,8 @@ export default function Menu({navigation: {navigate, reset}}){
                         }     */}
   
                     </Box>
+
+                    <ScrollView>
 
                     <Box style={{marginBottom: 20}}>
 
@@ -160,13 +171,14 @@ export default function Menu({navigation: {navigate, reset}}){
                         <Modal.Body>
 
                             <Box flex={1} bg={'white'}>
-                                <Text style={[styleModal.texto]}>Inicio: {inicio}</Text>
-                                <Text style={[styleModal.texto]}>Final: {final}</Text>
+                                <Text style={[styleModal.texto]}>Data: {formatoData(inicio)}</Text>
                                 <Text style={[styleModal.texto]}>Descrição: {descricao}</Text>
+                                <Text style={[styleModal.texto]}>Finalizado: {finalizado == 1 ? 'Sim':'Não'}</Text>
                             </Box>
                         
                         </Modal.Body>
-                        <Modal.Footer>
+                        <Modal.Footer justifyContent='space-between'>
+                            <Button onPress={() => finalizar({id})} bg='success.500'>Finalizar</Button>
                             <Button onPress={() => deletar({id})} bg='danger.600'>Excluir</Button>
                         </Modal.Footer>
                     </Modal.Content>
