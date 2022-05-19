@@ -8,9 +8,30 @@ const styleLemb = StyleSheet.create({
         borderRadius: 5,
         margin: 5
     },
-    miniCard: {
+    miniCardAzul: {
         flex: 1,
         backgroundColor: '#4440F5',
+        borderRadius: 5,
+        padding: 5,
+        justifyContent: 'center'
+    },
+    miniCardCinza: {
+        flex: 1,
+        backgroundColor: '#525252',
+        borderRadius: 5,
+        padding: 5,
+        justifyContent: 'center'
+    },
+    miniCardVerde: {
+        flex: 1,
+        backgroundColor: '#1EB91B',
+        borderRadius: 5,
+        padding: 5,
+        justifyContent: 'center'
+    },
+    miniCardVermelho: {
+        flex: 1,
+        backgroundColor: '#F54B40',
         borderRadius: 5,
         padding: 5,
         justifyContent: 'center'
