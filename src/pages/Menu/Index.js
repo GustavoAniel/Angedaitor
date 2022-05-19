@@ -1,4 +1,4 @@
-import React, {useEffect, useState, use} from 'react';
+import React, {useEffect, useState} from 'react';
 import { NativeBaseProvider, Box, Divider, Modal, Button } from 'native-base';
 import { Pressable, Text, ScrollView, FlatList  } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
